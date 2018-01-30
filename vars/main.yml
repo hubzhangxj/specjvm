@@ -1,0 +1,4 @@
+---
+# vars file for specjvm
+remote_user: root
+test_dir: /tmp/specjvm
