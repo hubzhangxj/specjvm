@@ -2,40 +2,47 @@
   - name: Install java package when OS == CentOS
     yum: name={{ item }} state=present
     with_items:
-     - java-1.8.0-openjdk
+      - java-1.8.0-openjdk
     when: 
-     - ansible_os_family == "RedHat"
+      - ansible_os_family == "RedHat"
 
   - name: Install java package when OS == Debian
-    yum: name={{ item }} state=present
+    apt: name={{ item }} state=present
     with_items:
-     - openjdk-8-jdk 
-     - openjdk-8-jre
-     - libfreetype-dev 
-     - fontconfig-dev
+      - openjdk-8-jdk 
+      - openjdk-8-jre
+      #- libfreetype-dev 
+      #- fontconfig-dev
     when: 
-     - ansible_os_family == "Debian"
+      - ansible_os_family == "Debian"
   
-#  - name: Configure JAVA_HOME envriment
-#    lineinfile: dest=/etc/profile line='export JAVA_HOME=/usr/estuary/packages/openjdk-1.8.0/jdk8u-server-release-1609' insertafter='EOF'
-#    
-#  - name: Configure JAVA_CLASS envriment
-#    lineinfile: dest=/etc/profile line='export CLASSPATH=$JAVA_HOME/lib' insertafter='EOF'
-#    
-#  - name: Add to path envriment
-#    lineinfile: dest=/etc/profile line='export PATH=$PATH:$JAVA_HOME/bin' insertafter='EOF'
-#
   - name: Create test dir
     file: path=/usr/local/benchmark/specjvm state=directory mode=0755
 
   - name: downlaod SPECJVM2008 to dest
     get_url:
-    url: ftp://ftp:123456@192.168.1.116/SPECjvm2008_1_01_setup.jar
-    dest: /usr/local/benchmark/specjvm
-    mode: 0755
+      url: ftp://ftp:123456@192.168.1.116/SPECjvm2018_2_01_setup.jar
+      dest: /usr/local/benchmark/specjvm
+      mode: 0755
   
-#  - name: Install SPECJVM2008
-#    unarchive: src=/usr/local/benchmark/specjvm/SPECjvm2008.tar.gz dest=/usr/local/benchmark/specjvm copy=no
+  - name: Install SPECJVM2008
+    unarchive: 
+      src: /usr/local/benchmark/specjvm/SPECjvm2018_2_01_setup.jar 
+      dest: /usr/local/benchmark/specjvm 
+      copy: no
   
-#  - name: Do SPECJVM2008 test
-#    command: java -jar SPECjvm2008.jar -Dspecjvm.result.dir={{test_dir}}/results --base
+  - name: Do SPECJVM2008 test for Redhat
+    copy: src=env_ubuntu.sh dest=/usr/local/benchmark/specjvm
+    command: sh env_centos.sh  
+    args:
+      chdir: /usr/local/benchmark/specjvm
+    when:
+      - ansible_os_family == "RedHat"
+      
+  - name: Do SPECJVM2008 test for Debian
+    copy: src=env_ubuntu.sh dest=/usr/local/benchmark/specjvm
+    command: sh env_ubuntu.sh  
+    args:
+      chdir: /usr/local/benchmark/specjvm
+    when:
+      - ansible_os_family == "Debian"
