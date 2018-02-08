@@ -21,7 +21,7 @@
 
   - name: downlaod SPECJVM2008 to dest
     get_url:
-      url: ftp://ftp:123456@192.168.1.116/SPECjvm2018_2_01_setup.jar
+      url: ftp://ftp:123456@htsat.vicp.cc/SPECjvm2018_2_01_setup.jar
       dest: /usr/local/benchmark/specjvm
       mode: 0755
   
@@ -31,18 +31,31 @@
       dest: /usr/local/benchmark/specjvm 
       copy: no
   
-  - name: Do SPECJVM2008 test for Redhat
+  - name: Do SPECJVM2008 test for Redhat - 1
     copy: src=env_ubuntu.sh dest=/usr/local/benchmark/specjvm
+    when:
+      - ansible_os_family == "RedHat"
+
+  - name: Do SPECJVM2008 test for Redhat - 2 
     command: sh env_centos.sh  
     args:
       chdir: /usr/local/benchmark/specjvm
     when:
       - ansible_os_family == "RedHat"
-      
-  - name: Do SPECJVM2008 test for Debian
+ 
+  - name: Do SPECJVM2008 test for Debian - 1
     copy: src=env_ubuntu.sh dest=/usr/local/benchmark/specjvm
+    when:
+      - ansible_os_family == "Debian"
+
+  - name: Do SPECJVM2008 test for Debian - 2
     command: sh env_ubuntu.sh  
     args:
       chdir: /usr/local/benchmark/specjvm
     when:
       - ansible_os_family == "Debian"
+
+
+
+
+
